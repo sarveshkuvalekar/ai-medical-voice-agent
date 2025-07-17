@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { FiMenu, FiX } from "react-icons/fi";
 import { User } from "@clerk/nextjs/server";
 import { useState } from "react";
+import { Menu, X } from 'lucide-react';
 
 export default function HeroSectionOne() {
 
@@ -77,8 +78,65 @@ export default function HeroSectionOne() {
   );
 }
 
+// const Navbar = () => {
+//   const { user } = useUser();
+
+//   return (
+//     <nav className="fixed top-0 left-0 z-50 flex w-full items-center justify-between bg-green-100 border border-lime-500 rounded-xl px-4 py-4 dark:border-neutral-800">
+//       <div className="flex items-center gap-2">
+//         <img
+//           src="./logo_1.png"
+//           alt="Logo"
+//           className="h-auto w-full max-w-[120px] sm:max-w-[150px] md:max-w-[180px] lg:max-w-[200px] xl:max-w-[220px] rounded-2xl border"
+//         />
+//       </div>
+//       <div className="flex gap-10 text-green-900 font-semibold text-lg">
+//         <div className=" hover:pointer-fine:">
+//           <p className="transition  duration-300 hover:text-green-700 cursor-pointer    hover:scale-105">Home</p>
+//         </div>
+//         <div>
+//           <p onClick={() => {
+//             const section = document.getElementById("pricing");
+//             section?.scrollIntoView({ behavior: "smooth" });
+//           }} className="transition duration-300 hover:text-green-700 cursor-pointer  hover:scale-105">Pricing</p>
+//         </div>
+//         <div>
+//           <p onClick={() => {
+//             const section = document.getElementById("contact");
+//             section?.scrollIntoView({ behavior: "smooth" });
+//           }} className="transition  duration-300 hover:text-green-700 cursor-pointer hover:scale-105">Contact Us</p>
+//         </div>
+//       </div>
+//       {
+//         !user ? <Link href={'/sign-in'}><button className="w-24 md:w-32 transform rounded-lg bg-black px-6 py-2 font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200">
+//           Login
+//         </button></Link> :
+//           <div className="flex gap-5 items-center">
+//             <UserButton />
+//             <Link href={'/dashboard'}>
+//               <Button className="hover:cursor-pointer">Dashboard</Button>
+//             </Link>
+//           </div>
+//       }
+//     </nav>
+//   );
+// };
+
 const Navbar = () => {
   const { user } = useUser();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleNavClick = (elementId?: string) => {
+    if (elementId) {
+      const section = document.getElementById(elementId);
+      section?.scrollIntoView({ behavior: "smooth" });
+    }
+    setIsMenuOpen(false); // Close mobile menu after clicking
+  };
 
   return (
     <nav className="fixed top-0 left-0 z-50 flex w-full items-center justify-between bg-green-100 border border-lime-500 rounded-xl px-4 py-4 dark:border-neutral-800">
@@ -89,38 +147,115 @@ const Navbar = () => {
           className="h-auto w-full max-w-[120px] sm:max-w-[150px] md:max-w-[180px] lg:max-w-[200px] xl:max-w-[220px] rounded-2xl border"
         />
       </div>
-      <div className="flex gap-10 text-green-900 font-semibold text-lg">
-        <div className=" hover:pointer-fine:">
-          <p className="transition  duration-300 hover:text-green-700 cursor-pointer    hover:scale-105">Home</p>
+
+      {/* Desktop Navigation */}
+      <div className="hidden md:flex gap-10 text-green-900 font-semibold text-lg">
+        <div>
+          <p className="transition duration-300 hover:text-green-700 cursor-pointer hover:scale-105">
+            Home
+          </p>
         </div>
         <div>
-          <p onClick={() => {
-            const section = document.getElementById("pricing");
-            section?.scrollIntoView({ behavior: "smooth" });
-          }} className="transition duration-300 hover:text-green-700 cursor-pointer  hover:scale-105">Pricing</p>
+          <p 
+            onClick={() => handleNavClick("pricing")}
+            className="transition duration-300 hover:text-green-700 cursor-pointer hover:scale-105"
+          >
+            Pricing
+          </p>
         </div>
         <div>
-          <p onClick={() => {
-            const section = document.getElementById("contact");
-            section?.scrollIntoView({ behavior: "smooth" });
-          }} className="transition  duration-300 hover:text-green-700 cursor-pointer hover:scale-105">Contact Us</p>
+          <p 
+            onClick={() => handleNavClick("contact")}
+            className="transition duration-300 hover:text-green-700 cursor-pointer hover:scale-105"
+          >
+            Contact Us
+          </p>
         </div>
       </div>
-      {
-        !user ? <Link href={'/sign-in'}><button className="w-24 md:w-32 transform rounded-lg bg-black px-6 py-2 font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200">
-          Login
-        </button></Link> :
+
+      {/* Mobile Hamburger Menu Button */}
+      <div className="md:hidden">
+        <button
+          onClick={toggleMenu}
+          className="text-green-900 hover:text-green-700 focus:outline-none"
+        >
+          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </div>
+
+      {/* Desktop Auth Buttons */}
+      <div className="hidden md:flex">
+        {!user ? (
+          <Link href={'/sign-in'}>
+            <button className="w-24 md:w-32 transform rounded-lg bg-black px-6 py-2 font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200">
+              Login
+            </button>
+          </Link>
+        ) : (
           <div className="flex gap-5 items-center">
             <UserButton />
             <Link href={'/dashboard'}>
               <Button className="hover:cursor-pointer">Dashboard</Button>
             </Link>
           </div>
-      }
+        )}
+      </div>
+
+      {/* Mobile Menu Dropdown */}
+      {isMenuOpen && (
+        <div className="absolute top-full left-0 right-0 bg-green-100 border border-lime-500 rounded-xl mt-2 mx-4 md:hidden shadow-lg">
+          <div className="flex flex-col p-4 space-y-4">
+            {/* Mobile Navigation Links */}
+            <div 
+              onClick={() => handleNavClick()}
+              className="text-green-900 font-semibold text-lg hover:text-green-700 cursor-pointer py-2 border-b border-green-200"
+            >
+              Home
+            </div>
+            <div 
+              onClick={() => handleNavClick("pricing")}
+              className="text-green-900 font-semibold text-lg hover:text-green-700 cursor-pointer py-2 border-b border-green-200"
+            >
+              Pricing
+            </div>
+            <div 
+              onClick={() => handleNavClick("contact")}
+              className="text-green-900 font-semibold text-lg hover:text-green-700 cursor-pointer py-2 border-b border-green-200"
+            >
+              Contact Us
+            </div>
+            
+            {/* Mobile Auth Section */}
+            <div className="pt-4">
+              {!user ? (
+                <Link href={'/sign-in'}>
+                  <button 
+                    onClick={() => setIsMenuOpen(false)}
+                    className="w-full transform rounded-lg bg-black px-6 py-2 font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200"
+                  >
+                    Login
+                  </button>
+                </Link>
+              ) : (
+                <div className="flex flex-col gap-3 items-center">
+                  <UserButton />
+                  <Link href={'/dashboard'}>
+                    <Button 
+                      onClick={() => setIsMenuOpen(false)}
+                      className="hover:cursor-pointer w-full"
+                    >
+                      Dashboard
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };
-
 
 const PricingCards = () => {
   const { user } = useUser();
